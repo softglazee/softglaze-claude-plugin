@@ -1,0 +1,37 @@
+{
+  "name": "softglaze-browser",
+  "displayName": "SoftGlaze Browser",
+  "version": "1.0.0",
+  "description": "Work with SoftGlaze Browser profiles from Claude: check profile and proxy health, find why a profile gets CAPTCHAs, fix timezone and language mismatches, run macros and test your own site from other countries. Every change waits for your approval in the SoftGlaze app. Needs SoftGlaze Browser 1.0.22 or newer running on the same Windows computer.",
+  "author": {
+    "name": "SoftGlaze",
+    "email": "support@softglaze.com",
+    "url": "https://browser.softglaze.com"
+  },
+  "homepage": "https://browser.softglaze.com/docs/ai-agents",
+  "repository": "https://github.com/softglazee/softglaze-claude-plugin",
+  "license": "MIT",
+  "keywords": ["softglaze", "browser-profiles", "proxies", "mcp", "automation", "qa"],
+  "icon": "./assets/icon.png",
+  "documentationUrl": "https://browser.softglaze.com/docs/ai-agents",
+  "supportUrl": "https://browser.softglaze.com/support",
+  "privacyPolicyUrl": "https://browser.softglaze.com/privacy",
+  "termsOfServiceUrl": "https://browser.softglaze.com/terms",
+  "userConfig": {
+    "token": {
+      "type": "string",
+      "title": "SoftGlaze AI token",
+      "description": "A token from SoftGlaze Browser: SoftGlaze AI page, Tokens tab, Create token. It starts with sgai_. Make one for this app only. It is stored in your system's secure storage.",
+      "sensitive": true,
+      "default": ""
+    },
+    "port": {
+      "type": "number",
+      "title": "SoftGlaze AI port",
+      "description": "The port shown on the SoftGlaze AI page (8080 unless the Owner changed it on the Settings tab).",
+      "default": 8080,
+      "min": 1024,
+      "max": 65535
+    }
+  }
+}

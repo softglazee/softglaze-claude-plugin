@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "softglaze": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/server/softglaze-browser-bridge.js"],
+      "env": {
+        "SOFTGLAZE_TOKEN": "${user_config.token}",
+        "SOFTGLAZE_PORT": "${user_config.port}"
+      }
+    }
+  }
+}

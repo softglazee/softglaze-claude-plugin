@@ -1,0 +1,20 @@
+{
+  "name": "softglaze-proxy",
+  "displayName": "SoftGlaze Proxy Switcher",
+  "version": "1.0.0",
+  "description": "Let Claude use the SoftGlaze Proxy Switcher extension for Chrome and Edge: check the proxy status, test proxies, switch proxies, add per-site rules, find free proxies and check the IP sites see. Every change waits for your approval in the browser. Needs the extension and the SoftGlaze Proxy Bridge on your computer.",
+  "author": {
+    "name": "SoftGlaze",
+    "email": "support@softglaze.com",
+    "url": "https://browser.softglaze.com"
+  },
+  "homepage": "https://browser.softglaze.com/proxy-extension",
+  "repository": "https://github.com/softglazee/softglaze-claude-plugin",
+  "license": "MIT",
+  "keywords": ["softglaze", "proxy", "proxy-switcher", "chrome-extension", "mcp"],
+  "icon": "./assets/icon.png",
+  "documentationUrl": "https://browser.softglaze.com/proxy-extension/bridge",
+  "supportUrl": "https://browser.softglaze.com/support",
+  "privacyPolicyUrl": "https://browser.softglaze.com/privacy",
+  "termsOfServiceUrl": "https://browser.softglaze.com/terms"
+}

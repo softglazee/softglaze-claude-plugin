@@ -1,0 +1,14 @@
+{
+  "name": "softglaze-claude-plugins-repo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Repository tooling for the SoftGlaze Claude plugins (tests only; nothing here is shipped to users).",
+  "scripts": {
+    "test": "node --test test/bridge.test.js",
+    "validate": "claude plugin validate . && claude plugin validate ./plugins/softglaze-browser && claude plugin validate ./plugins/softglaze-proxy"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
