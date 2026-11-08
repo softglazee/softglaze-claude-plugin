@@ -14,11 +14,9 @@ Walk the user through these steps. They do every step themselves; never ask for 
    - Claude Code: run `/plugin`, open the **Installed** tab, choose **softglaze-browser**, then
      **Configure**, and paste the token. Set the port too if it is not 8080. Then run
      `/reload-plugins` or start a new session.
-   - Cowork (Claude desktop app): Cowork does not ask for plugin settings, so save a connection
-     file instead, at `%USERPROFILE%\.softglaze\mcp-connection.json`:
-     `{ "url": "http://127.0.0.1:8080/mcp", "token": "sgai_..." }`
-     Only the user should be able to read this file. Revoke the token in SoftGlaze if the file is
-     ever shared.
+   - Claude Desktop chats and Cowork: Cowork does not show plugin settings yet, so install the
+     SoftGlaze extension for Claude Desktop (`softglaze-browser.mcpb`, linked from
+     https://browser.softglaze.com/docs/ai-agents); it asks for the token.
 5. **Check it.** In Claude Code, `/mcp` should list `plugin:softglaze-browser:softglaze` as connected.
    In a terminal, `node "<plugin folder>/server/softglaze-browser-bridge.js" --check` prints the
    address it uses and whether SoftGlaze accepted the token.

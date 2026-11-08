@@ -24,7 +24,7 @@ const INIT = {
 // Starts the bridge as the AI app would and returns helpers to talk to it over stdio.
 function startBridge(env) {
   const child = spawn(process.execPath, [BRIDGE], {
-    env: { PATH: process.env.PATH, SYSTEMROOT: process.env.SYSTEMROOT, SOFTGLAZE_CONNECTION_FILE: NO_FILE, ...env },
+    env: { PATH: process.env.PATH, SYSTEMROOT: process.env.SYSTEMROOT, ...env },
     stdio: ['pipe', 'pipe', 'pipe']
   });
   const messages = [];
@@ -67,47 +67,22 @@ function freePort() {
   });
 }
 
-test('resolveConfig: environment first, then the connection file, then the default', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sg-cfg-'));
-  const file = path.join(dir, 'conn.json');
-  fs.writeFileSync(file, JSON.stringify({ url: 'http://localhost:9123/mcp', token: TEST_TOKEN }));
-
-  let c = bridgeLib.resolveConfig({ SOFTGLAZE_CONNECTION_FILE: file });
-  assert.equal(c.url.href, 'http://localhost:9123/mcp');
-  assert.equal(c.token, TEST_TOKEN);
-  assert.equal(c.tokenSource, file);
-  assert.deepEqual(c.problems, []);
-
-  c = bridgeLib.resolveConfig({ SOFTGLAZE_CONNECTION_FILE: file, SOFTGLAZE_PORT: '8099', SOFTGLAZE_TOKEN: `sgai_${'E'.repeat(40)}` });
-  assert.equal(c.url.href, 'http://127.0.0.1:8099/mcp');
-  assert.equal(c.tokenSource, 'SOFTGLAZE_TOKEN');
-
-  c = bridgeLib.resolveConfig({ SOFTGLAZE_CONNECTION_FILE: file, SOFTGLAZE_MCP_URL: 'http://[::1]:8100/mcp', SOFTGLAZE_PORT: '8099' });
-  assert.equal(c.url.href, 'http://[::1]:8100/mcp');
-
-  c = bridgeLib.resolveConfig({ SOFTGLAZE_CONNECTION_FILE: NO_FILE });
-  assert.equal(c.url.href, 'http://127.0.0.1:8080/mcp');
-  assert.equal(c.token, '');
-  assert.match(c.problems.join(' '), /No SoftGlaze AI token/);
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
 test('resolveConfig: unfilled ${user_config.*} values count as empty', () => {
-  const c = bridgeLib.resolveConfig({ SOFTGLAZE_CONNECTION_FILE: NO_FILE, SOFTGLAZE_TOKEN: '${user_config.token}', SOFTGLAZE_PORT: '${user_config.port}' });
+  const c = bridgeLib.resolveConfig({ SOFTGLAZE_TOKEN: '${user_config.token}', SOFTGLAZE_PORT: '${user_config.port}' });
   assert.equal(c.token, '');
   assert.equal(c.url.href, 'http://127.0.0.1:8080/mcp');
 });
 
 test('resolveConfig: refuses any address that is not on this computer', () => {
   for (const url of ['http://example.com/mcp', 'http://192.168.1.5:8080/mcp', 'https://softglaze.com/mcp', 'ftp://127.0.0.1/mcp']) {
-    const c = bridgeLib.resolveConfig({ SOFTGLAZE_CONNECTION_FILE: NO_FILE, SOFTGLAZE_MCP_URL: url, SOFTGLAZE_TOKEN: TEST_TOKEN });
+    const c = bridgeLib.resolveConfig({ SOFTGLAZE_MCP_URL: url, SOFTGLAZE_TOKEN: TEST_TOKEN });
     assert.equal(c.url, null, url);
     assert.ok(c.problems.length > 0, url);
   }
 });
 
 test('resolveConfig: a Developer API key is named as the wrong kind of token', () => {
-  const c = bridgeLib.resolveConfig({ SOFTGLAZE_CONNECTION_FILE: NO_FILE, SOFTGLAZE_TOKEN: `sg_${'k'.repeat(32)}` });
+  const c = bridgeLib.resolveConfig({ SOFTGLAZE_TOKEN: `sg_${'k'.repeat(32)}` });
   assert.match(c.problems.join(' '), /Developer API key/);
 });
 
@@ -211,29 +186,12 @@ test('no token: every request is answered with the setup steps, and nothing is s
   }
 });
 
-test('takes the token from the connection file when the environment has none', async () => {
-  const mock = await startMock();
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sg-conn-'));
-  const file = path.join(dir, 'mcp-connection.json');
-  fs.writeFileSync(file, `﻿${JSON.stringify({ url: mock.url, token: mock.token })}`);
-  const b = startBridge({ SOFTGLAZE_CONNECTION_FILE: file, SOFTGLAZE_TOKEN: '${user_config.token}' });
-  try {
-    b.send(INIT);
-    const r = await b.waitFor(1);
-    assert.equal(r.result.serverInfo.name, 'softglaze');
-  } finally {
-    await b.stop();
-    await mock.close();
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
 test('--check reports a working connection without printing the token', async () => {
   const mock = await startMock();
   try {
     const out = await new Promise((resolve) => {
       const c = spawn(process.execPath, [BRIDGE, '--check'], {
-        env: { PATH: process.env.PATH, SYSTEMROOT: process.env.SYSTEMROOT, SOFTGLAZE_CONNECTION_FILE: NO_FILE, SOFTGLAZE_MCP_URL: mock.url, SOFTGLAZE_TOKEN: mock.token }
+        env: { PATH: process.env.PATH, SYSTEMROOT: process.env.SYSTEMROOT, SOFTGLAZE_MCP_URL: mock.url, SOFTGLAZE_TOKEN: mock.token }
       });
       let s = '';
       c.stdout.on('data', (d) => { s += d; });
@@ -245,4 +203,22 @@ test('--check reports a working connection without printing the token', async ()
   } finally {
     await mock.close();
   }
+});
+
+test('resolveConfig: the plugin setting names come first, then SOFTGLAZE_*, then the default', () => {
+  let c = bridgeLib.resolveConfig({ CLAUDE_PLUGIN_OPTION_TOKEN: `sgai_${'P'.repeat(40)}`, CLAUDE_PLUGIN_OPTION_PORT: '8091', SOFTGLAZE_TOKEN: `sgai_${'S'.repeat(40)}`, SOFTGLAZE_PORT: '8092' });
+  assert.equal(c.tokenSource, 'CLAUDE_PLUGIN_OPTION_TOKEN');
+  assert.equal(c.urlSource, 'CLAUDE_PLUGIN_OPTION_PORT');
+  assert.equal(c.url.port, '8091');
+  c = bridgeLib.resolveConfig({ SOFTGLAZE_TOKEN: `sgai_${'S'.repeat(40)}`, SOFTGLAZE_PORT: '8092' });
+  assert.equal(c.tokenSource, 'SOFTGLAZE_TOKEN');
+  assert.equal(c.url.port, '8092');
+  c = bridgeLib.resolveConfig({});
+  assert.equal(c.urlSource, 'default');
+  assert.ok(c.problems.some((p) => /No SoftGlaze AI token/.test(p)));
+});
+
+test('the bridge source reads no files', () => {
+  const src = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'plugins', 'softglaze-browser', 'server', 'softglaze-browser-bridge.js'), 'utf8');
+  assert.ok(!/readFileSync|homedir|require\('node:fs'\)/.test(src));
 });

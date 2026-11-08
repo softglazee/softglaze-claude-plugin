@@ -37,12 +37,10 @@ SoftGlaze app, and you can press **Stop all AI** there at any time.
 
 1. In Claude, open **Customize > Plugins**, add the marketplace `softglazee/softglaze-claude-plugin`
    and install **SoftGlaze Browser** (or install it from the directory once it is listed there).
-2. Cowork does not ask for plugin settings, so save your token in a connection file at
-   `%USERPROFILE%\.softglaze\mcp-connection.json`:
-   ```json
-   { "url": "http://127.0.0.1:8080/mcp", "token": "sgai_your_token" }
-   ```
-   Keep this file private. If it is ever shared, revoke the token in SoftGlaze.
+2. Cowork does not show plugin settings yet, so this plugin cannot get your token there. For Claude
+   Desktop chats and Cowork, install the SoftGlaze extension for Claude Desktop instead
+   (`softglaze-browser.mcpb` from https://browser.softglaze.com/docs/ai-agents): it asks for the
+   token and keeps it in your system's secure storage.
 3. Start a Cowork task on this computer and ask Claude to call `workspace_summary`.
 
 ## Use it

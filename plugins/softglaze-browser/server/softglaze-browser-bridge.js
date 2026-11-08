@@ -13,21 +13,17 @@
 // It has no dependencies (Node.js 18 or newer). It talks to nothing but SoftGlaze on this computer:
 // it refuses any address that is not 127.0.0.1, localhost or [::1]. Its own messages go to stderr.
 //
-// Settings, first match wins:
-//   address  SOFTGLAZE_MCP_URL, then SOFTGLAZE_PORT, then "url" in the connection file,
+// Settings come only from the environment the AI app sets (the plugin's settings box), first match
+// wins:
+//   address  SOFTGLAZE_MCP_URL, then CLAUDE_PLUGIN_OPTION_PORT or SOFTGLAZE_PORT,
 //            then http://127.0.0.1:8080/mcp
-//   token    SOFTGLAZE_TOKEN, then "token" in the connection file
-// The connection file is SOFTGLAZE_CONNECTION_FILE, or ~/.softglaze/mcp-connection.json, and looks
-// like { "url": "http://127.0.0.1:8080/mcp", "token": "sgai_..." }. It is optional: it is for apps
-// that cannot ask for the token themselves (Cowork does not prompt for plugin settings).
+//   token    CLAUDE_PLUGIN_OPTION_TOKEN, then SOFTGLAZE_TOKEN
+// The bridge reads no files.
 //
 // Commands: (none) run the bridge; --check test the connection and exit; --version; --help.
 
 const http = require('node:http');
 const https = require('node:https');
-const fs = require('node:fs');
-const os = require('node:os');
-const path = require('node:path');
 const readline = require('node:readline');
 
 const VERSION = '1.0.0';
@@ -46,25 +42,6 @@ function clean(value) {
   return /^\$\{[^}]*\}$/.test(v) ? '' : v;
 }
 
-function defaultConnectionFile() {
-  return path.join(os.homedir(), '.softglaze', 'mcp-connection.json');
-}
-
-function readConnectionFile(file) {
-  let text;
-  try { text = fs.readFileSync(file, 'utf8'); } catch (e) { return { found: false, url: '', token: '' }; }
-  try {
-    const j = JSON.parse(text.replace(/^﻿/, ''));
-    return {
-      found: true,
-      url: typeof j.url === 'string' ? j.url.trim() : '',
-      token: typeof j.token === 'string' ? j.token.trim() : ''
-    };
-  } catch (e) {
-    return { found: true, url: '', token: '', error: `${file} is not valid JSON.` };
-  }
-}
-
 function checkUrl(raw) {
   let u;
   try { u = new URL(raw); } catch (e) { return { ok: false, message: `"${raw}" is not a valid address.` }; }
@@ -75,36 +52,32 @@ function checkUrl(raw) {
   return { ok: true, url: u };
 }
 
-// Works out the address and token from the environment and the connection file.
+// Works out the address and token from the environment.
 function resolveConfig(env = process.env) {
-  const connectionFile = clean(env.SOFTGLAZE_CONNECTION_FILE) || defaultConnectionFile();
-  const conn = readConnectionFile(connectionFile);
   const problems = [];
-  if (conn.error) problems.push(conn.error);
 
   let rawUrl = clean(env.SOFTGLAZE_MCP_URL);
   let urlSource = rawUrl ? 'SOFTGLAZE_MCP_URL' : '';
-  const port = clean(env.SOFTGLAZE_PORT);
+  const portName = clean(env.CLAUDE_PLUGIN_OPTION_PORT) ? 'CLAUDE_PLUGIN_OPTION_PORT' : 'SOFTGLAZE_PORT';
+  const port = clean(env[portName]);
   if (!rawUrl && port) {
     const n = Number(port);
-    if (Number.isInteger(n) && n >= 1 && n <= 65535) { rawUrl = `http://127.0.0.1:${n}/mcp`; urlSource = 'SOFTGLAZE_PORT'; }
+    if (Number.isInteger(n) && n >= 1 && n <= 65535) { rawUrl = `http://127.0.0.1:${n}/mcp`; urlSource = portName; }
     else problems.push(`The port "${port}" is not a number from 1 to 65535.`);
   }
-  if (!rawUrl && conn.url) { rawUrl = conn.url; urlSource = connectionFile; }
   if (!rawUrl) { rawUrl = `http://127.0.0.1:${DEFAULT_PORT}/mcp`; urlSource = 'default'; }
   const checked = checkUrl(rawUrl);
   if (!checked.ok) problems.push(checked.message);
 
-  let token = clean(env.SOFTGLAZE_TOKEN);
-  let tokenSource = token ? 'SOFTGLAZE_TOKEN' : '';
-  if (!token && conn.token) { token = conn.token; tokenSource = connectionFile; }
+  const tokenName = clean(env.CLAUDE_PLUGIN_OPTION_TOKEN) ? 'CLAUDE_PLUGIN_OPTION_TOKEN' : 'SOFTGLAZE_TOKEN';
+  const token = clean(env[tokenName]);
+  const tokenSource = token ? tokenName : '';
   if (!token) {
-    problems.push('No SoftGlaze AI token. Create one in SoftGlaze Browser (SoftGlaze AI page, Tokens tab), then enter it in the plugin settings (Claude Code: /plugin, Installed, softglaze-browser, Configure) or save it in '
-      + `${connectionFile} as {"token": "sgai_..."}.`);
+    problems.push('No SoftGlaze AI token. Create one in SoftGlaze Browser (SoftGlaze AI page, Tokens tab), then enter it in the plugin settings (Claude Code: /plugin, Installed, softglaze-browser, Configure).');
   } else if (API_TOKEN.test(token) && !AI_TOKEN.test(token)) {
     problems.push('This is a Developer API key (sg_...). The MCP server needs a SoftGlaze AI token (sgai_...) from the SoftGlaze AI page.');
   }
-  return { url: checked.ok ? checked.url : null, urlSource, token, tokenSource, connectionFile, problems };
+  return { url: checked.ok ? checked.url : null, urlSource, token, tokenSource, problems };
 }
 
 function hasId(message) {
@@ -391,8 +364,8 @@ SoftGlaze Browser on this computer.
   node softglaze-browser-bridge.js --check    test the address and token, then exit
   node softglaze-browser-bridge.js --version
 
-Environment: SOFTGLAZE_TOKEN (sgai_...), SOFTGLAZE_PORT or SOFTGLAZE_MCP_URL,
-SOFTGLAZE_CONNECTION_FILE (default ~/.softglaze/mcp-connection.json).`;
+Environment: CLAUDE_PLUGIN_OPTION_TOKEN or SOFTGLAZE_TOKEN (sgai_...),
+CLAUDE_PLUGIN_OPTION_PORT, SOFTGLAZE_PORT or SOFTGLAZE_MCP_URL. The bridge reads no files.`;
 
 if (require.main === module) {
   const arg = process.argv[2] || '';
@@ -406,4 +379,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { Bridge, resolveConfig, checkUrl, readConnectionFile, httpErrorMessage, clean, VERSION };
+module.exports = { Bridge, resolveConfig, checkUrl, httpErrorMessage, clean, VERSION };
