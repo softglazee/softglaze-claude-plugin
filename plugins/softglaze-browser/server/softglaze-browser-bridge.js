@@ -239,6 +239,8 @@ class Bridge {
         this.replyError(message, `The SoftGlaze session ended and a new one could not start: ${e.message}`);
         return;
       }
+      // The new session already got its own "initialized" notification.
+      if (message && message.method === 'notifications/initialized') return;
       await this.forward(message, true);
       return;
     }
