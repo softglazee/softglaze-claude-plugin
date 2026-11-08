@@ -1,0 +1,33 @@
+{
+  "name": "softglaze-browser-connector",
+  "displayName": "SoftGlaze Browser connector",
+  "version": "1.1.0",
+  "description": "Connects Claude Code to the SoftGlaze AI tools inside SoftGlaze Browser 1.0.22 or newer on the same Windows computer, through a small dependency-free Node.js bridge that only talks to 127.0.0.1. Install it next to the SoftGlaze Browser skills plugin. Every change waits for your approval in the SoftGlaze app.",
+  "author": {
+    "name": "SoftGlaze",
+    "email": "support@softglaze.com",
+    "url": "https://browser.softglaze.com"
+  },
+  "homepage": "https://browser.softglaze.com/docs/ai-agents",
+  "repository": "https://github.com/softglazee/softglaze-claude-plugin",
+  "license": "MIT",
+  "keywords": ["softglaze", "browser-profiles", "mcp"],
+  "icon": "./assets/icon.png",
+  "userConfig": {
+    "token": {
+      "type": "string",
+      "title": "SoftGlaze AI token",
+      "description": "A token from SoftGlaze Browser: SoftGlaze AI page, Tokens tab, Create token. It starts with sgai_. Make one for this app only. It is stored in your system's secure storage.",
+      "sensitive": true,
+      "default": ""
+    },
+    "port": {
+      "type": "number",
+      "title": "SoftGlaze AI port",
+      "description": "The port shown on the SoftGlaze AI page (8080 unless the Owner changed it on the Settings tab).",
+      "default": 8080,
+      "min": 1024,
+      "max": 65535
+    }
+  }
+}

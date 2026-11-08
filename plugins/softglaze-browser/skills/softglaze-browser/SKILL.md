@@ -10,9 +10,9 @@ Each profile has its own cookies, storage, fingerprint and proxy. Its MCP server
 app on 127.0.0.1 only, and every call runs as the team member the user's token belongs to, with
 that member's permissions, and is written to the app's activity log.
 
-The tools come from this plugin's `softglaze` MCP server. If no SoftGlaze tools are available, or a
+The tools come from SoftGlaze Browser's own MCP server, which the user connects once (the `softglaze-browser-connector` plugin, the Claude Desktop extension, or `claude mcp add`). If no SoftGlaze tools are available, or a
 call answers that SoftGlaze is not reachable, read `references/connect.md` and help the user connect.
-Never ask the user to paste their token into the chat: they enter it in the plugin settings.
+Never ask the user to paste their token into the chat: they enter it where they connected SoftGlaze (the connector plugin's settings, the Claude Desktop extension, or their own `claude mcp add` command).
 
 ## Before you act
 
@@ -84,7 +84,7 @@ are also served by the SoftGlaze MCP server itself.
 | Answer | What it means and what to tell the user |
 |---|---|
 | Not reachable | SoftGlaze is closed, the AI server is off, or the port is different. See `references/connect.md`. |
-| 401 | The token is missing, wrong, revoked or expired. They create a new one on the Tokens tab and enter it in the plugin settings. |
+| 401 | The token is missing, wrong, revoked or expired. They create a new one on the Tokens tab and enter it where they connected SoftGlaze. |
 | 403 | Refused: the token's scope or groups do not cover this, the member lacks permission, or it is a Developer API key (sg_) instead of an AI token (sgai_). |
 | 423 | The workspace is locked. They unlock it in the app. |
 | 429 | More than 120 calls a minute from this token. Wait, then continue with fewer calls. |

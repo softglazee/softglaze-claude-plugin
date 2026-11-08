@@ -10,13 +10,23 @@
     {
       "name": "softglaze-browser",
       "source": "./plugins/softglaze-browser",
-      "description": "Work with SoftGlaze Browser profiles, proxies, macros and page tools from Claude. Every change waits for your approval in the app.",
+      "description": "Skills for SoftGlaze Browser profiles, proxies, macros and page tools in Claude. Pair it with softglaze-browser-connector for the tools. Every change waits for your approval in the app.",
       "category": "productivity",
       "tags": [
         "browser-profiles",
         "proxies",
         "automation",
         "qa"
+      ]
+    },
+    {
+      "name": "softglaze-browser-connector",
+      "source": "./plugins/softglaze-browser-connector",
+      "description": "Connects Claude Code to SoftGlaze Browser's AI tools on this computer (local bridge to 127.0.0.1). Install it with softglaze-browser.",
+      "category": "productivity",
+      "tags": [
+        "browser-profiles",
+        "mcp"
       ]
     }
   ]

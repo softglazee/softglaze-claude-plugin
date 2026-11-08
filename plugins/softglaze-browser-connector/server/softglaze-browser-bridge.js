@@ -73,7 +73,7 @@ function resolveConfig(env = process.env) {
   const token = clean(env[tokenName]);
   const tokenSource = token ? tokenName : '';
   if (!token) {
-    problems.push('No SoftGlaze AI token. Create one in SoftGlaze Browser (SoftGlaze AI page, Tokens tab), then enter it in the plugin settings (Claude Code: /plugin, Installed, softglaze-browser, Configure).');
+    problems.push('No SoftGlaze AI token. Create one in SoftGlaze Browser (SoftGlaze AI page, Tokens tab), then enter it in the plugin settings (Claude Code: /plugin, Installed, softglaze-browser-connector, Configure).');
   } else if (API_TOKEN.test(token) && !AI_TOKEN.test(token)) {
     problems.push('This is a Developer API key (sg_...). The MCP server needs a SoftGlaze AI token (sgai_...) from the SoftGlaze AI page.');
   }

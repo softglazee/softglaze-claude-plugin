@@ -5,8 +5,10 @@ check which profiles and proxies have problems, find out why a profile keeps get
 timezone and language settings that disagree with a proxy, write and run macros, warm up new
 profiles, or open your own site from several countries and compare what each visitor sees.
 
-Claude never changes anything on its own: every change waits for you to press **Allow** in the
-SoftGlaze app, and you can press **Stop all AI** there at any time.
+This plugin is a set of skills: written instructions that teach Claude how to use SoftGlaze's own AI
+tools well. The tools themselves live inside the SoftGlaze Browser app on your computer, and you
+connect them once (see below). Claude never changes anything on its own: every change waits for you
+to press **Allow** in the SoftGlaze app, and you can press **Stop all AI** there at any time.
 
 ## What you need
 
@@ -14,34 +16,25 @@ SoftGlaze app, and you can press **Stop all AI** there at any time.
   **AI server** switch). SoftGlaze AI is a Beta. Only the Owner or an Admin can switch it on and
   create tokens.
 - A SoftGlaze AI token (Tokens tab, **Create token**). It starts with `sgai_`.
-- Claude Code, or Cowork in the Claude desktop app, on the same computer as SoftGlaze. In claude.ai
-  chat on the web the skills load, but the SoftGlaze tools do not, because SoftGlaze only answers on
-  this computer.
-- Node.js 18 or newer on the PATH, which runs the small bridge this plugin includes.
+- Claude Code, or Claude Desktop (chats and Cowork), on the same computer as SoftGlaze. In claude.ai
+  chat on the web the skills load, but SoftGlaze's tools cannot be reached there, because SoftGlaze
+  only answers on your own computer.
 
 ## Set it up
 
-**Claude Code**
-
-1. Add the marketplace and install the plugin:
-   ```
-   /plugin marketplace add softglazee/softglaze-claude-plugin
-   /plugin install softglaze-browser@softglaze
-   ```
-2. When Claude Code asks, paste your token and keep the port at 8080 unless the SoftGlaze AI page
-   shows another one. To change them later: `/plugin`, **Installed**, **softglaze-browser**,
-   **Configure**.
-3. Run `/mcp` and check that `plugin:softglaze-browser:softglaze` is connected.
-
-**Cowork (Claude desktop app)**
-
-1. In Claude, open **Customize > Plugins**, add the marketplace `softglazee/softglaze-claude-plugin`
-   and install **SoftGlaze Browser** (or install it from the directory once it is listed there).
-2. Cowork does not show plugin settings yet, so this plugin cannot get your token there. For Claude
-   Desktop chats and Cowork, install the SoftGlaze extension for Claude Desktop instead
-   (`softglaze-browser.mcpb` from https://browser.softglaze.com/docs/ai-agents): it asks for the
-   token and keeps it in your system's secure storage.
-3. Start a Cowork task on this computer and ask Claude to call `workspace_summary`.
+1. Install this plugin (from the Claude directory, or in Claude Code:
+   `/plugin marketplace add softglazee/softglaze-claude-plugin`, then
+   `/plugin install softglaze-browser@softglaze`).
+2. Connect SoftGlaze's tools, one way only:
+   - **Claude Code:** install the companion plugin
+     `/plugin install softglaze-browser-connector@softglaze` and paste your token when asked, or add
+     the server yourself:
+     `claude mcp add --transport http softglaze http://127.0.0.1:8080/mcp --header "Authorization: Bearer <YOUR_TOKEN>"`.
+   - **Claude Desktop chats and Cowork:** install the SoftGlaze extension for Claude Desktop
+     (`softglaze-browser.mcpb`, linked from https://browser.softglaze.com/docs/ai-agents). It asks for
+     the token and keeps it in your system's secure storage.
+3. Ask Claude to "check my SoftGlaze connection". The `softglaze-browser` skill walks you through any
+   step that is missing.
 
 ## Use it
 
@@ -66,28 +59,21 @@ workflows, which you can run by name in Claude Code and Cowork:
 
 ## What it runs and what data it sends
 
-- **What runs:** `server/softglaze-browser-bridge.js`, a dependency-free Node.js script that Claude
-  starts as a local MCP server. It reads MCP messages from Claude, sends them to SoftGlaze on
-  `http://127.0.0.1:<port>/mcp` with your token, and passes the answers back. It refuses any address
-  that is not 127.0.0.1, localhost or [::1], so your token and data never leave your computer through
-  this plugin. It writes nothing to disk.
-- **Where the token comes from:** the plugin setting (stored in your system's secure storage by
-  Claude Code), or, if that is empty, the connection file above.
-- **What Claude sees:** the results of the SoftGlaze tools it calls, such as profile names, groups,
-  proxy countries and check results, page text and screenshots from profiles it opens. SoftGlaze never
-  gives AI apps cookies, 2FA codes, proxy passwords, saved-login passwords, billing or member
-  management, and AI apps cannot delete anything. Claude sends what it sees to Anthropic as part of
-  your conversation, under your Claude plan's terms.
-- **SoftGlaze's servers:** this plugin sends nothing to SoftGlaze's servers. The SoftGlaze app itself
-  keeps an activity log of every AI call on your computer.
+- **What runs:** nothing. This plugin contains only Markdown skills, this README, a license and an
+  icon. It has no scripts, no hooks and no MCP server of its own.
+- **What Claude sees:** when you have connected SoftGlaze's tools, Claude sees the results of the
+  tools it calls, such as profile names, groups, proxy countries and check results, and page text
+  and screenshots from profiles it opens. SoftGlaze never gives AI apps cookies, 2FA codes, proxy
+  passwords, saved-login passwords, billing or member management, and AI apps cannot delete anything.
+  Claude sends what it sees to Anthropic as part of your conversation, under your Claude plan's terms.
+- **SoftGlaze's servers:** this plugin sends nothing to SoftGlaze's servers. The SoftGlaze app keeps
+  an activity log of every AI call on your computer.
 
 ## Trouble
 
-- `/mcp` shows the server as failed: open SoftGlaze and switch on the AI server, then check the port
-  and token. In a terminal, `node "<plugin folder>/server/softglaze-browser-bridge.js" --check` shows
-  the address it uses and whether SoftGlaze accepted the token.
-- No Node.js: install it from nodejs.org, or skip this plugin's server and connect Claude Code over
-  HTTP: `claude mcp add --transport http softglaze http://127.0.0.1:8080/mcp --header "Authorization: Bearer <YOUR_TOKEN>"`.
+- Claude says the SoftGlaze tools are missing: connect them (step 2 above), then start a new session.
+- Not reachable: open SoftGlaze and switch on the AI server, then check the port and token shown on
+  the SoftGlaze AI page.
 - Full guide: https://browser.softglaze.com/docs/ai-agents
 
 ## License

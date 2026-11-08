@@ -1,5 +1,5 @@
 'use strict';
-// Tests for plugins/softglaze-browser/server/softglaze-browser-bridge.js against a mock SoftGlaze
+// Tests for plugins/softglaze-browser-connector/server/softglaze-browser-bridge.js against a mock SoftGlaze
 // endpoint (test/mock-softglaze.js). Run: npm test  (Node.js 18 or newer, no packages needed).
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -9,9 +9,9 @@ const os = require('node:os');
 const path = require('node:path');
 const net = require('node:net');
 const { startMock, TEST_TOKEN } = require('./mock-softglaze');
-const bridgeLib = require('../plugins/softglaze-browser/server/softglaze-browser-bridge.js');
+const bridgeLib = require('../plugins/softglaze-browser-connector/server/softglaze-browser-bridge.js');
 
-const BRIDGE = path.join(__dirname, '..', 'plugins', 'softglaze-browser', 'server', 'softglaze-browser-bridge.js');
+const BRIDGE = path.join(__dirname, '..', 'plugins', 'softglaze-browser-connector', 'server', 'softglaze-browser-bridge.js');
 const NO_FILE = path.join(os.tmpdir(), `softglaze-no-such-file-${process.pid}.json`);
 
 const INIT = {
@@ -219,6 +219,6 @@ test('resolveConfig: the plugin setting names come first, then SOFTGLAZE_*, then
 });
 
 test('the bridge source reads no files', () => {
-  const src = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'plugins', 'softglaze-browser', 'server', 'softglaze-browser-bridge.js'), 'utf8');
+  const src = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'plugins', 'softglaze-browser-connector', 'server', 'softglaze-browser-bridge.js'), 'utf8');
   assert.ok(!/readFileSync|homedir|require\('node:fs'\)/.test(src));
 });
