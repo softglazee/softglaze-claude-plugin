@@ -5,21 +5,19 @@
     "email": "support@softglaze.com",
     "url": "https://browser.softglaze.com"
   },
-  "description": "SoftGlaze plugins for Claude: SoftGlaze Browser (isolated browser profiles) and SoftGlaze Proxy Switcher (browser proxy extension).",
+  "description": "SoftGlaze plugins for Claude: SoftGlaze Browser (isolated browser profiles). The SoftGlaze Proxy Switcher plugin joins when the extension is live.",
   "plugins": [
     {
       "name": "softglaze-browser",
       "source": "./plugins/softglaze-browser",
       "description": "Work with SoftGlaze Browser profiles, proxies, macros and page tools from Claude. Every change waits for your approval in the app.",
       "category": "productivity",
-      "tags": ["browser-profiles", "proxies", "automation", "qa"]
-    },
-    {
-      "name": "softglaze-proxy",
-      "source": "./plugins/softglaze-proxy",
-      "description": "Let Claude use the SoftGlaze Proxy Switcher extension for Chrome and Edge through the SoftGlaze Proxy Bridge.",
-      "category": "productivity",
-      "tags": ["proxy", "chrome-extension"]
+      "tags": [
+        "browser-profiles",
+        "proxies",
+        "automation",
+        "qa"
+      ]
     }
   ]
 }
