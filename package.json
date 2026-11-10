@@ -4,7 +4,7 @@
   "private": true,
   "description": "Repository tooling for the SoftGlaze Claude plugins (tests only; nothing here is shipped to users).",
   "scripts": {
-    "test": "node --test test/bridge.test.js",
+    "test": "node --test test/bridge.test.js test/glama.test.js",
     "validate": "claude plugin validate . && claude plugin validate ./plugins/softglaze-browser && claude plugin validate ./plugins/softglaze-browser-connector && claude plugin validate ./plugins/softglaze-proxy"
   },
   "engines": {
